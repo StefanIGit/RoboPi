@@ -1,0 +1,43 @@
+Install:
+# sudo -Es
+# apt install pi-bluetooth
+
+
+Connect:
+# bluetoothctl
+[bluetooth]# scan on
+    >> switch on the gamepad (in pairing mode !?!? like 5 sec on OUYA button until the middel 2 white LEDs are blinking)
+    wait until u see the controller...
+    [NEW] Device B8:5A:F7:C6:22:4C B8-5A-F7-C6-22-4C
+    [CHG] Device B8:5A:F7:C6:22:4C LegacyPairing: no
+    [CHG] Device B8:5A:F7:C6:22:4C Name: OUYA Game Controller
+    [CHG] Device B8:5A:F7:C6:22:4C Alias: OUYA Game Controller
+[bluetooth]# scan off
+    ...
+    Discovery stopped
+    [CHG] Controller B8:27:EB:15:F6:D8 Discovering: no
+[bluetooth]# pair B8:5A:F7:C6:22:4C
+    Attempting to pair with B8:5A:F7:C6:22:4C
+    [CHG] Device B8:5A:F7:C6:22:4C Connected: yes
+    [CHG] Device B8:5A:F7:C6:22:4C Modalias: usb:v2836p0001d0104
+    [CHG] Device B8:5A:F7:C6:22:4C UUIDs: 00001000-0000-1000-8000-00805f9b34fb
+    [CHG] Device B8:5A:F7:C6:22:4C UUIDs: 00001124-0000-1000-8000-00805f9b34fb
+    [CHG] Device B8:5A:F7:C6:22:4C UUIDs: 00001200-0000-1000-8000-00805f9b34fb
+    [CHG] Device B8:5A:F7:C6:22:4C ServicesResolved: yes
+    [CHG] Device B8:5A:F7:C6:22:4C Paired: yes
+Pairing successful
+    [CHG] Device B8:5A:F7:C6:22:4C ServicesResolved: no
+    [CHG] Device B8:5A:F7:C6:22:4C Connected: no
+[bluetooth]# trust B8:5A:F7:C6:22:4C
+    [CHG] Device B8:5A:F7:C6:22:4C Trusted: yes
+    Changing B8:5A:F7:C6:22:4C trust succeeded
+[bluetooth]# connect B8:5A:F7:C6:22:4C
+    Attempting to connect to B8:5A:F7:C6:22:4C
+    [CHG] Device B8:5A:F7:C6:22:4C Connected: yes
+    Connection successful
+    [CHG] Device B8:5A:F7:C6:22:4C ServicesResolved: yes
+[OUYA Game Controller]# quit
+
+Done.
+
+From now on every time u switch on the gamepad it auto connects.
