@@ -17,16 +17,25 @@ this mus run as root...... or pi if u know how let me know :)
 from evdev import InputDevice, categorize, ecodes
 import robomove
 import time
+import os
 
 #creates object 'gamepad' to store the data
 #you can call it whatever you like
-while True:
-    try:
-        gamepad = InputDevice('/dev/input/event0')
-        break
-    except:
-        print('Controller not found sleeping for 2 Sec...')
-        time.sleep(2)
+path = '/dev/input'
+bFoundGamepad = False 
+while not bFoundGamepad:
+    eventList = os.listdir(path)
+    print (eventList)
+    for eventDevice in eventList:
+        try:
+            gamepad = InputDevice(path + '/' + eventDevice)
+            if gamepad.name.startswith('OUYA'):
+                bFoundGamepad = True
+                break
+            time.sleep(1)
+        except:
+            print('Controller not found sleeping for 2 Sec...')
+            time.sleep(2)
         
 
 
@@ -36,14 +45,14 @@ print(gamepad)
 
 
 def scaleSpeed ( x, in_min=0,  in_max=65535,  out_min=-100,  out_max=100):
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
 
 
 
 # not sure if needed but does not do harm too 
-xSpeed = 0
-ySpeed = 0
+xSpeedScaled = 0
+ySpeedScaled = 0
 leftSpeed = 0
 rightSpeed = 0
 
@@ -60,8 +69,8 @@ for event in gamepad.read_loop():
             robomove.enable_right_motor(0)
             leftSpeed  = 0
             rightSpeed = 0
-            xSpeed  = 0
-            ySpeed = 0            
+            xSpeedScaled  = 0
+            ySpeedScaled = 0            
         else:
             bOpressed = False
         if event.code == 312 and event.value == 1:
@@ -103,26 +112,35 @@ for event in gamepad.read_loop():
                 # the left joystick...
                 # based on http://home.kendra.com/mauser/Joystick.html
                 #
-
-                if event.code == 1:
+                if event.code == 4:#1:
                     ySpeed = event.value
-                    ySpeed = scaleSpeed(ySpeed) *-1
-                if event.code == 0:
+                    if 125 < ySpeed <130:
+                        ySpeed = 128
+                    elif ySpeed <13:
+                        ySpeed = 0
+                    ySpeedScaled = scaleSpeed(ySpeed,0,255,-100,100) *-1
+                    #print (event.value, ySpeed, ySpeedScaled)
+                if event.code == 3:#0:
                     xSpeed = event.value
-                    xSpeed = scaleSpeed(xSpeed) #*-1
-                
-                RpL = (100-abs(xSpeed)) * (ySpeed/100) + ySpeed
-                RmL = (100-abs(ySpeed)) * (xSpeed/100) + xSpeed
+                    if 125 < xSpeed <130:
+                        xSpeed = 128
+                    elif xSpeed >230:
+                        xSpeed = 255
+                    xSpeedScaled = scaleSpeed(xSpeed,0,255,-100,100) *-1
+                    #print (event.value, xSpeed, xSpeedScaled)
+                #continue
+                RpL = (100-abs(xSpeedScaled)) * (ySpeedScaled/100) + ySpeedScaled
+                RmL = (100-abs(ySpeedScaled)) * (xSpeedScaled/100) + xSpeedScaled
                 leftSpeed =  (RpL + RmL)/2
                 rightSpeed = (RpL - RmL)/2
 
 
                 #print ('Leftmotor: %s / Rightmotor: %s'% (leftSpeed, rightSpeed))
                 # speec limit ;)
-                leftSpeed = scaleSpeed(leftSpeed, in_min=-100, in_max=100, out_min=-50, out_max=50)
-                rightSpeed = scaleSpeed(rightSpeed, in_min=-100, in_max=100, out_min=-50, out_max=50)
-                #print ('\nySpeed: {0}\t-\txSpeed: {1}\nRpL: {2}\t-\tRmL: {3}\nleftSpeed: {4}\t-\trightSpeed: {5}\n'
-                #            .format(ySpeed, xSpeed, RpL, RmL, leftSpeed, rightSpeed))
+                #leftSpeed = scaleSpeed(leftSpeed, in_min=-100, in_max=100, out_min=-50, out_max=50)
+                #rightSpeed = scaleSpeed(rightSpeed, in_min=-100, in_max=100, out_min=-50, out_max=50)
+                print ('\nySpeed: {0}\t-\txSpeed: {1}\nRpL: {2}\t-\tRmL: {3}\nleftSpeed: {4}\t-\trightSpeed: {5}\n'
+                            .format(ySpeedScaled, xSpeedScaled, RpL, RmL, leftSpeed, rightSpeed))
 
                 robomove.enable_left_motor(leftSpeed)
                 robomove.enable_right_motor(rightSpeed)
@@ -132,5 +150,5 @@ for event in gamepad.read_loop():
                 #robomove.enable_right_motor(0)
                 leftSpeed  = 0
                 rightSpeed = 0
-                xSpeed  = 0
-                ySpeed = 0
+                xSpeedScaled  = 0
+                ySpeedScaled = 0
