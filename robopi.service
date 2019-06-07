@@ -1,0 +1,12 @@
+[Unit]
+Description=RoboPi
+#After=graphical.target
+
+[Service]
+Type=simple
+#RemainAfterExit=yes
+Restart=on-failure
+ExecStart=/usr/bin/python /root/RoboPi/gamepad.py
+
+[Install]
+WantedBy=default.target
