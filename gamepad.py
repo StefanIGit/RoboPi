@@ -29,7 +29,7 @@ while not bFoundGamepad:
     for eventDevice in eventList:
         try:
             gamepad = InputDevice(path + '/' + eventDevice)
-            if gamepad.name.startswith('OUYA'):
+            if gamepad.name.startswith('Sony') or gamepad.name.startswith('OUYA'):
                 bFoundGamepad = True
                 break
             time.sleep(1)
